@@ -5,10 +5,12 @@
 using namespace std;
 
 Robot::Robot(int level_id){
+    this->level_id = level_id;
     reset(level_id);
 }
 
 void Robot::reset(int level_id){
+    this->level_id = level_id;
     // 清空传送带和空地状态
     while(!input_box.empty()) input_box.pop();
     output_box.clear();
