@@ -14,7 +14,7 @@ public:
     queue<int> input_box;  //输入传送带状态
     vector<int> output_box; //输出传送带状态
     vector<int> empty_spaces; //空地状态，INT_MIN表示无积木
-    int pc;              //当前指令编号
+    int pc;              //当前指令编号,注意指令是1-based
     int exec_count;      //已执行指令计数
     int current_box;     //当前的积木
     vector<Instruction> program; //当前加载的程序

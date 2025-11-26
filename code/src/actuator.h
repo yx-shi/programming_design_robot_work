@@ -23,7 +23,7 @@ enum class instruction_type {
 struct Instruction {
     instruction_type instruction; // 操作码
     int arg;                      // 操作数（如空地编号 / 跳转目标行号）
-
+    bool is_valid;       //标注指令是否合法
     bool has_arg() const {
         return instruction == instruction_type::ADD ||
                instruction == instruction_type::SUB ||
@@ -33,8 +33,8 @@ struct Instruction {
                instruction == instruction_type::JUMPIFZERO;
     }
 
-    Instruction(instruction_type t, int arg = -1) : instruction(t), arg(arg) {}
-    Instruction() : instruction(instruction_type::INBOX), arg(-1) {}
+    Instruction(instruction_type t, int arg = -1, bool is_valid = true) : instruction(t), arg(arg), is_valid(is_valid) {}
+    Instruction() : instruction(instruction_type::INBOX), arg(-1), is_valid(true) {}
 };
 
 enum class RunResultType {

@@ -1,6 +1,7 @@
 #include "robot.h"
 #include "level.h"
 #include<iostream>
+#include<climits>
 
 using namespace std;
 
@@ -23,8 +24,10 @@ void Robot::reset(int level_id){
     LevelManager lm;
     Level level = lm.get_level(level_id);
 
-    //TODO: 根据关卡信息初始化输入传送带
-
+    //根据关卡信息初始化输入传送带
+    for(int val : level.get_input()){
+        input_box.push(val);
+    }
     // 初始化空地状态
     empty_spaces.resize(level.get_empty_count(), INT_MIN);
 }

@@ -22,6 +22,8 @@ public:
     void set_empty_count(int count);  //设置空地数量
     void set_valid_instructions(const set<string>& instructions);  //设置有效指令集合
     void set_description(const string& desc);  //设置关卡描述
+    vector<int> get_input() const { return input; }
+    vector<int> get_target_output() const { return target_output; }
     set<string> get_valid_instructions() const { return valid_instructions; }
 };
 
