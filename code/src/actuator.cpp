@@ -106,7 +106,186 @@ void Actuator::reset(int level_id) {
 }
 
 RunResult Actuator::run() {
-    //TODO: 实现机器人程序执行逻辑
+    // 根据当前 robot.level_id 获取关卡信息
+    LevelManager lm;
+    Level level = lm.get_level(robot.level_id);
+
+    // 每次运行前重置机器人状态（会按关卡重新初始化输入传送带和空地）
+    robot.reset(robot.level_id);
+    RunResult result;
+
+    // 主执行循环
+    while (true) {
+        // 1. 如果 pc 越界，说明指令执行完成 → 关卡结束
+        if (robot.pc < 0 || robot.pc >= (int)robot.program.size()) {
+            break;
+        }
+        Instruction &instr = robot.program[robot.pc];
+        int line_no = robot.pc + 1; // 原始指令序号（1-based）
+
+        // 2. 如果指令在解析阶段就被标记为非法，直接报错
+        if (!instr.is_valid) {
+            result.type = RunResultType::ERROR;
+            result.error_index = line_no;
+            result.exec_count = robot.exec_count;
+            return result;
+        }
+
+        // 3. 检查该指令是否在当前关卡允许的指令集中
+        if (!is_instruction_allowed(level, instr)) {
+            result.type = RunResultType::ERROR;
+            result.error_index = line_no;
+            result.exec_count = robot.exec_count;
+            return result;
+        }
+
+        // 4. 执行当前指令
+        bool error = false;
+
+        switch (instr.instruction) {
+            case instruction_type::INBOX: {
+                if (robot.input_box.empty()) {
+                    // 执行 inbox 时输入传送带为空 → 关卡结束（正常）
+                    // 不视为错误，直接结束循环
+                    robot.pc++; // pc 增加与否都不影响结束判断，这里加 1 以保持一致性
+                    goto end_execution;
+                }
+                robot.current_box = robot.input_box.front();
+                robot.input_box.pop();
+                robot.pc++;
+                break;
+            }
+
+            case instruction_type::OUTBOX: {
+                if (robot.current_box == INT_MIN) {
+                    error = true;
+                } else {
+                    robot.output_box.push_back(robot.current_box);
+                    robot.current_box = INT_MIN;
+                    robot.pc++;
+                }
+                break;
+            }
+
+            case instruction_type::ADD: {
+                // 检查空地下标合法性以及空地中是否有积木
+                if (robot.current_box == INT_MIN || !is_valid_empty_space_arg(level, instr)) {
+                    error = true;
+                } else {
+                    int idx = instr.arg;
+                    robot.current_box += robot.empty_spaces[idx];
+                    robot.pc++;
+                }
+                break;
+            }
+
+            case instruction_type::SUB: {
+                if (robot.current_box == INT_MIN || !is_valid_empty_space_arg(level, instr)) {
+                    error = true;
+                } else {
+                    int idx = instr.arg;
+                    robot.current_box -= robot.empty_spaces[idx];
+                    robot.pc++;
+                }
+                break;
+            }
+
+            case instruction_type::COPYTO: {
+                // 需要有当前积木，且空地下标合法
+                if (robot.current_box == INT_MIN) {
+                    error = true;
+                } else {
+                    int empty_count = level.get_empty_count();
+                    int idx = instr.arg;
+                    if (idx < 0 || idx >= empty_count) {
+                        error = true;
+                    } else {
+                        robot.empty_spaces[idx] = robot.current_box;
+                        robot.pc++;
+                    }
+                }
+                break;
+            }
+
+            case instruction_type::COPYFROM: {
+                int empty_count = level.get_empty_count();
+                int idx = instr.arg;
+                if (idx < 0 || idx >= empty_count || robot.empty_spaces[idx] == INT_MIN) {
+                    error = true;
+                } else {
+                    robot.current_box = robot.empty_spaces[idx];
+                    robot.pc++;
+                }
+                break;
+            }
+
+            case instruction_type::JUMP: {
+                int target = instr.arg; // 1-based 行号
+                if (target < 1 || target > (int)robot.program.size()) {
+                    error = true;
+                } else {
+                    robot.pc = target - 1;
+                }
+                break;
+            }
+
+            case instruction_type::JUMPIFZERO: {
+                int target = instr.arg; // 1-based 行号
+                if (robot.current_box == INT_MIN) {
+                    error = true;
+                } else if (robot.current_box == 0) {
+                    if (target < 1 || target > (int)robot.program.size()) {
+                        error = true;
+                    } else {
+                        robot.pc = target - 1;
+                    }
+                } else {
+                    robot.pc++;
+                }
+                break;
+            }
+
+            default:
+                error = true;
+                break;
+        }
+
+        if (error) {
+            result.type = RunResultType::ERROR;
+            result.error_index = line_no;
+            result.exec_count = robot.exec_count;
+            return result;
+        }
+
+        // 成功执行一条指令
+        robot.exec_count++;
+    }
+
+end_execution:
+    // 正常结束后，对比输出与目标输出
+    {
+        const vector<int> &out = robot.output_box;
+        const vector<int> target = level.get_target_output();
+        if (out.size() == target.size()) {
+            bool same = true;
+            for (size_t i = 0; i < out.size(); ++i) {
+                if (out[i] != target[i]) {
+                    same = false;
+                    break;
+                }
+            }
+            if (same) {
+                result.type = RunResultType::SUCCESS;
+            } else {
+                result.type = RunResultType::FAIL;
+            }
+        } else {
+            result.type = RunResultType::FAIL;
+        }
+        result.error_index = -1;
+        result.exec_count = robot.exec_count;
+    }
+    return result;
 }
 
 /*TODO：似乎还不够鲁棒，需要检查指令参数的合法性,如是否越界等，空地合法性检查可以调用is_valid_empty_space_arg函数
