@@ -1,12 +1,104 @@
 #include "actuator.h"
 #include "robot.h"
 #include "level.h"
+#include<fstream>
 #include<iostream>
 #include<vector>
 using namespace std;
 
-void Actuator::read_as_program(int ins_num) {
-    //TODO: 从输入读取 ins_num 条指令，解析后存入 robot.program
+//辅助函数，解析单行指令并处理
+Instruction parse_instruction_line(const string& line) {
+    // 解析指令
+    string instr_str;
+    string arg_str;
+    int arg = -1;
+    size_t space_pos = line.find(' ');
+    if (space_pos != string::npos) {
+        instr_str = line.substr(0, space_pos);
+        //处理参数部分，包括检查参数数量是否唯一，以及参数是否是整数
+        arg_str = line.substr(space_pos + 1);
+    } else {
+        instr_str = line;
+    }
+    //将指令转为小写字母串以便识别
+    for (char& c : instr_str) {
+        c = tolower(c);
+    }
+    // 将字符串转换为 instruction_type
+    instruction_type instr_type;
+    bool is_valid = true;
+    if (instr_str == "inbox") {
+        instr_type = instruction_type::INBOX;
+    } else if (instr_str == "outbox") {
+        instr_type = instruction_type::OUTBOX;
+    } else if (instr_str == "add") {
+        instr_type = instruction_type::ADD;
+    } else if (instr_str == "sub") {
+        instr_type = instruction_type::SUB;
+    } else if (instr_str == "copyto") {
+        instr_type = instruction_type::COPYTO;
+    } else if (instr_str == "copyfrom") {
+        instr_type = instruction_type::COPYFROM;
+    } else if (instr_str == "jump") {
+        instr_type = instruction_type::JUMP;
+    } else if (instr_str == "jumpifzero") {
+        instr_type = instruction_type::JUMPIFZERO;
+    } else {
+        is_valid = false; // 非法指令
+    }
+    Instruction instr(instr_type, arg, is_valid);
+    //处理指令合法性
+    if (is_valid)   //指令本身合法，继续检查参数合法性
+    {
+        //处理参数部分
+        if (!arg_str.empty()) {
+            //检查参数是否唯一,且是否为整数
+            arg_str.erase(0, arg_str.find_first_not_of(' ')); //去除前导空格
+            arg_str.erase(arg_str.find_last_not_of(' ') + 1); //去除尾随空格
+            size_t extra_space_pos = arg_str.find(' ');
+            if (extra_space_pos != string::npos) {
+                instr.set_error(); //参数不唯一，视为非法指令
+            } else {
+                try {
+                    arg = stoi(arg_str);
+                    instr.arg = arg;
+                } catch (const invalid_argument&) {
+                    instr.set_error(); //参数不是整数，视为非法指令
+                }
+            }
+        }
+    }
+    //指令参数均合法，进行最终合法性判定
+    instr.judge_valid();
+    return instr;
+}
+
+
+void Actuator::read_from_cli(int ins_num) {
+    robot.program.clear();
+    cin.ignore(); // 清除之前输入留下的换行符
+    for (int i = 0; i < ins_num; ++i) {
+        string line;
+        getline(cin, line);
+        Instruction instr = parse_instruction_line(line);
+        robot.program.push_back(instr);
+    }
+}
+
+bool Actuator::read_from_file(const string& file_path) {
+    robot.program.clear();
+    ifstream infile(file_path);
+    if (!infile.is_open()) {
+        cerr << "无法打开文件: " << file_path << endl;
+        return false;
+    }
+    string line;
+    while (getline(infile, line)) {
+        Instruction instr = parse_instruction_line(line);
+        robot.program.push_back(instr);
+    }
+    infile.close();
+    return true;
 }
 
 void Actuator::reset(int level_id) {

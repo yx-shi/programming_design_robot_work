@@ -32,7 +32,22 @@ struct Instruction {
                instruction == instruction_type::JUMP ||
                instruction == instruction_type::JUMPIFZERO;
     }
-
+    void judge_valid(){
+        //如果指令需要参数但没有提供参数，或者指令不需要参数但提供了参数，则视为非法指令    
+        if(!has_arg() && arg!=-1){
+            is_valid=false;
+        }
+        else if(has_arg() && arg==-1){
+            is_valid=false;
+        }
+        //如果操作数不是非负整数，也视为非法指令
+        else if(has_arg() && arg<0){
+            is_valid=false;
+        } 
+    }
+    void set_error(){
+        is_valid=false;
+    }
     Instruction(instruction_type t, int arg = -1, bool is_valid = true) : instruction(t), arg(arg), is_valid(is_valid) {}
     Instruction() : instruction(instruction_type::INBOX), arg(-1), is_valid(true) {}
 };
@@ -79,8 +94,8 @@ public:
      * - 在外部解析好用户输入的文本指令（字符串）并转为 Instruction 序列后，
      *   调用 set_program() 存到 Actuator 中。
      */
-    void read_as_program(int ins_num);
-
+    void read_from_cli(int ins_num);
+    bool read_from_file(const string& file_path);
     /**
      * @brief 执行当前 program，在指定关卡上运行一局游戏
      *
