@@ -16,6 +16,8 @@ void game(){
     //选择关卡
     int level_id = 0; 
     //TODO: 实现关卡选择界面，获取用户选择的 level_id
+    cout<<"请输入要挑战的关卡ID（1 - "<<level_manager.get_level_count()<<")："<<endl;
+    cin>>level_id;
     Level level = level_manager.get_level(level_id);
     actuator.reset(level_id);
     //处理用户输入
@@ -59,4 +61,16 @@ void game(){
     }
     RunResult result = actuator.run(); //执行程序
     //其他待补充
+    if(result.type == RunResultType::SUCCESS) {
+        cout << "Success! 您已通过第" << level_id << "关" << endl;
+    } else if(result.type == RunResultType::FAIL) {
+        cout << "Fail! 程序执行结束，但输出与目标输出不一致。" << endl;
+    } else if(result.type == RunResultType::ERROR) {
+        cout << "Error on instruction " << result.error_index << "! " << endl;
+    }
+}
+
+int main() {
+    game();
+    return 0;
 }

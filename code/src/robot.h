@@ -3,9 +3,9 @@
 #include<queue>
 #include<string>
 #include<climits>
+#include "instruction.h"
 using namespace std;
 
-struct Instruction;//前向声明
 
 //Robot类，其中封装了某一时刻机器人和环境的全部状态。
 class Robot{

@@ -22,7 +22,7 @@ void Level::set_description(const string& desc){
     description = desc;
 }
 
-vector<Level> LevelManager::levels; //静态成员初始化
+vector<Level> LevelManager::levels; // 静态成员初始化
 
 LevelManager::LevelManager(){
     // ========== 初始化关卡1 ==========
