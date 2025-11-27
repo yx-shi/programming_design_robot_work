@@ -76,7 +76,6 @@ Instruction parse_instruction_line(const string& line) {
 
 void Actuator::read_from_cli(int ins_num) {
     robot.program.clear();
-    cin.ignore(); // 清除之前输入留下的换行符
     for (int i = 0; i < ins_num; ++i) {
         string line;
         getline(cin, line);
@@ -92,7 +91,7 @@ bool Actuator::read_from_file(const string& file_path) {
         cerr << "无法打开文件: " << file_path << endl;
         return false;
     }
-    string line;
+    string line;    
     while (getline(infile, line)) {
         Instruction instr = parse_instruction_line(line);
         robot.program.push_back(instr);
@@ -276,6 +275,10 @@ end_execution:
             }
             if (same) {
                 result.type = RunResultType::SUCCESS;
+                if(robot.level_id + 1 <= lm.get_level_count()) {
+                    lm.set_level_unlocked(robot.level_id+1); // 解锁下一关
+                    lm.set_local_level_unlocked(robot.level_id+1); // 本地存储解锁状态
+                }
             } else {
                 result.type = RunResultType::FAIL;
             }
@@ -321,4 +324,11 @@ bool Actuator::is_valid_empty_space_arg(const Level& level, const Instruction& i
         return empty_space_id >= 0 && empty_space_id < empty_count && robot.empty_spaces[empty_space_id] != INT_MIN;
     }
     return true; // 对于不需要检查空地参数的指令，直接返回 true
+}
+
+void Actuator::print_outbox() const {
+    for (const int& item : robot.output_box) {
+        cout << item << " ";
+    }
+    cout << endl;
 }

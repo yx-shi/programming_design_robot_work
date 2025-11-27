@@ -1,17 +1,28 @@
 {
+    "version": "2.0.0",
     "tasks": [
         {
             "type": "cppbuild",
-            "label": "C/C++: g++.exe 生成活动文件",
+            "label": "Build robot game",
             "command": "D:\\msys64\\ucrt64\\bin\\g++.exe",
             "args": [
                 "-fdiagnostics-color=always",
                 "-g",
-                "${file}",
+                // 注意：这里以 main.cpp 所在目录为工作目录
+                // ${fileDirname} 对于 game.cpp 是 e:\...\code\src
+                // 所以指向上一级 main.cpp 要写 ..\main.cpp
+                "..\\main.cpp",
+                "level.cpp",
+                "robot.cpp",
+                "actuator.cpp",
+                "game.cpp",
+                "-std=c++11",
                 "-o",
-                "${fileDirname}\\${fileBasenameNoExtension}.exe"
+                // 生成可执行文件放在 code 目录，名字叫 main.exe 或 game.exe 均可
+                "${fileDirname}\\..\\game.exe"
             ],
             "options": {
+                // 工作目录设为 src 目录
                 "cwd": "${fileDirname}"
             },
             "problemMatcher": [
@@ -21,8 +32,7 @@
                 "kind": "build",
                 "isDefault": true
             },
-            "detail": "调试器生成的任务。"
+            "detail": "构建整个平台（main.cpp + src/*.cpp）"
         }
-    ],
-    "version": "2.0.0"
+    ]
 }
