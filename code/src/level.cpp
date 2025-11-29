@@ -99,7 +99,7 @@ const Level& LevelManager::get_level(int level_id) const {
         }
     }
     // 若未找到，返回默认构造的Level对象
-    return Level(); 
+    return levels[0]; 
 }
 
 bool LevelManager::is_level_unlocked(int level_id) const {

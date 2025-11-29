@@ -1,6 +1,7 @@
 #include "actuator.h"
 #include "robot.h"
 #include "level.h"
+#include "view.h"
 #include<fstream>
 #include<iostream>
 #include<vector>
@@ -112,7 +113,7 @@ RunResult Actuator::run() {
     // 每次运行前重置机器人状态（会按关卡重新初始化输入传送带和空地）
     robot.reset(robot.level_id);
     RunResult result;
-
+    show_one_step(robot);
     // 主执行循环
     while (true) {
         // 1. 如果 pc 越界，说明指令执行完成 → 关卡结束
@@ -255,9 +256,9 @@ RunResult Actuator::run() {
             result.exec_count = robot.exec_count;
             return result;
         }
-
         // 成功执行一条指令
         robot.exec_count++;
+        show_one_step(robot);
     }
 
 end_execution:

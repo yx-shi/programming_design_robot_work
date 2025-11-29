@@ -5,27 +5,15 @@
 using namespace std;
 
 void initialize_view(const LevelManager& level_manager) {
-    /*TODO：显示开始页面,也就是关卡选择页面，要求显示：
-    * 关卡列表
-    * 每个关卡的解锁状态
-    * 提示用户选择关卡
-    */
-       // 清屏（兼容Windows/Linux/Mac）
-    #ifdef _WIN32
-        system("cls");
-    #else
-        system("clear");
-    #endif
-
     // 显示标题与关卡列表
     cout << "==================== 关卡选择 ====================" << endl;
     cout << "📌 请选择要挑战的关卡（已解锁关卡可直接进入）" << endl;
     cout << "------------------------------------------------" << endl;
 
     // 遍历所有关卡，显示编号、解锁状态
-    for (int i = 0; i < level_manager.get_level_count(); ++i) {
+    for (int i = 1; i <= level_manager.get_level_count(); ++i) {
         string status = level_manager.is_level_unlocked(i) ? "✅ 已解锁" : "❌ 未解锁";
-        cout << "  关卡" << (i + 1) << "：" << status << endl;
+        cout << "  关卡" << i << "：" << status << endl;
     }
 
     // 输入提示
@@ -39,15 +27,9 @@ void show_one_step(const Robot& robot) {
     */
 }
 
-void show_final_result(const Robot& robot, const RunResult& result) {
-    // 清屏
-    #ifdef _WIN32
-        system("cls");
-    #else
-        system("clear");
-    #endif
-
+void show_final_result(const Actuator& actuator, const RunResult& result) {
     // 显示结果标题
+    Robot robot = actuator.get_robot();
     int level_id = robot.level_id;
     LevelManager level_manager;
     cout << "==================== 第" << level_id << "关 结果 ====================" << endl;

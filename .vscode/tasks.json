@@ -11,7 +11,6 @@
                 // 注意：这里以 main.cpp 所在目录为工作目录
                 // ${fileDirname} 对于 game.cpp 是 e:\...\code\src
                 // 所以指向上一级 main.cpp 要写 ..\main.cpp
-                "..\\main.cpp",
                 "level.cpp",
                 "robot.cpp",
                 "actuator.cpp",

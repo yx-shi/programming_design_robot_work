@@ -14,7 +14,6 @@ void game(){
     //实现关卡选择界面，获取用户选择的 level_id
     cin.ignore(); //清除main函数中cin>>start_choice留下的换行符
     while(1){
-        cout<<"请输入要挑战的关卡ID（1 - "<<level_manager.get_level_count()<<")："<<endl;
         string level_id_str;
         getline(cin, level_id_str);
         try{
@@ -66,7 +65,7 @@ void game(){
                 continue;
             }
             int ins_num = stoi(ins_num_str);
-            cout<<"请依次输入"<<ins_num<<"条指令,注意每行一个指令，指令和操作数之间用空格分隔："<<endl;
+            cout<<"请依次输入"<<ins_num<<"条指令，注意每行一个指令，指令和操作数之间用空格分隔："<<endl;
             actuator.read_from_cli(ins_num);
             break;
         }
@@ -93,21 +92,7 @@ void game(){
     }
     RunResult result = actuator.run(); //执行程序
     //其他待补充
-    if(result.type == RunResultType::SUCCESS) {
-        cout << "Success! 您已通过第" << level_id << "关" << endl;
-    } else if(result.type == RunResultType::FAIL) {
-        cout << "Fail! 程序执行结束，但输出与目标输出不一致。" << endl;
-        cout<<"目标输出为：";
-        Level cur_level = level_manager.get_level(level_id);
-        for(int val : cur_level.get_target_output()){
-            cout<<val<<" ";
-        }
-        cout << endl;
-        cout<<"您的输出为：";  
-        actuator.print_outbox();
-    } else if(result.type == RunResultType::ERROR) {
-        cout << "Error on instruction " << result.error_index << "! " << endl;
-    }
+    show_final_result(actuator, result); //显示最终结果
 }
 
 int main() {

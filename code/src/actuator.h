@@ -72,6 +72,7 @@ public:
     RunResult run();
     void reset(int level_id); // 重置执行器状态（清空程序等）
     void print_outbox() const;
+    Robot get_robot() const{ return robot; } // 获取内部 Robot 对象的引用，便于调试等
 private:
     /**
      * @brief 内部工具函数：检查某一指令在当前关卡中是否被允许
