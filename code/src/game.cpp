@@ -2,39 +2,25 @@
 #include "actuator.h"
 #include "level.h"
 #include "robot.h"
+#include <limits>
 
 Actuator actuator;        //全局执行器对象
 
 
-void game(){
+int game(){
     LevelManager level_manager;
-    initialize_view(level_manager);//初始化加载界面
-    //选择关卡
-    int level_id = 0; 
-    //实现关卡选择界面，获取用户选择的 level_id
-    cin.ignore(); //清除main函数中cin>>start_choice留下的换行符
-    while(1){
-        string level_id_str;
-        getline(cin, level_id_str);
-        try{
-            level_id = stoi(level_id_str);
-        } catch (const invalid_argument&) {
-            cout<<"关卡ID输入无效，请重新输入。"<<endl;
-            continue;
-        }
-        
-        if(!level_manager.is_level_unlocked(level_id)){
-            cout<<"关卡未解锁或不存在，请重新输入！"<<endl;
-        }
-        else{
-            Level level = level_manager.get_level(level_id);
-            actuator.reset(level_id);
-            break;
-        }
+    int level_id = initialize_view(level_manager); // 返回0表示退出
+    if (level_id == 0) {
+        cout << "\033[2J\033[H";
+        cout << "已退出游戏。" << endl;
+        return 1;
     }
+    actuator.reset(level_id);
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
     //处理用户输入
     int input_error_count=0;
     while(1){
+        cout << "\033[2J\033[H";
         cout<<"请选择指令输入方式：\n1-直接输入指令\n2-读取文件\n请选择“1”或“2”:"<<endl;
         //直接读取用户的全部输入，对输入采用更鲁棒的处理方式
         string choice_str;
@@ -65,6 +51,7 @@ void game(){
                 continue;
             }
             int ins_num = stoi(ins_num_str);
+            cout << "\033[2J\033[H";
             cout<<"请依次输入"<<ins_num<<"条指令，注意每行一个指令，指令和操作数之间用空格分隔："<<endl;
             actuator.read_from_cli(ins_num);
             break;
@@ -93,6 +80,7 @@ void game(){
     RunResult result = actuator.run(); //执行程序
     //其他待补充
     show_final_result(actuator, result); //显示最终结果
+    return 0;
 }
 
 int main() {
@@ -101,7 +89,9 @@ int main() {
         char start_choice;
         cin>>start_choice;
         if(start_choice == 'y' || start_choice == 'Y'){
-            game();
+            if(game() != 0){
+                break;
+            }
         }
         else if(start_choice == 'n' || start_choice == 'N'){
             break;

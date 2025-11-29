@@ -27,6 +27,7 @@ public:
     vector<int> get_input() const { return input; }
     vector<int> get_target_output() const { return target_output; }
     set<string> get_valid_instructions() const { return valid_instructions; }
+    string get_description() const { return description; }
 };
 
 class LevelManager{
