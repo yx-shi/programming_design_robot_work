@@ -16,14 +16,14 @@ class Level{
 public:
     void unlock();
     Level(int level_id=0):id(level_id),is_unlocked(false),empty_count(0){}
-    void set_input(const vector<int>& in);    //设置输入序列
-    void set_target_output(const vector<int>& out);  //设置目标输出序列
-    void set_empty_count(int count);  //设置空地数量
-    void set_valid_instructions(const set<string>& instructions);  //设置有效指令集合
-    void set_description(const string& desc);  //设置关卡描述
-    int get_id() const { return id; } //获取关卡ID    
-    int get_empty_count() const{return empty_count;}   //获取空地数量
-    bool is_unlocked_level() const { return is_unlocked; } //获取解锁状态
+    void set_input(const vector<int>& in);    
+    void set_target_output(const vector<int>& out);  
+    void set_empty_count(int count);  
+    void set_valid_instructions(const set<string>& instructions);  
+    void set_description(const string& desc); 
+    int get_id() const { return id; }   
+    int get_empty_count() const{return empty_count;}   
+    bool is_unlocked_level() const { return is_unlocked; } 
     vector<int> get_input() const { return input; }
     vector<int> get_target_output() const { return target_output; }
     set<string> get_valid_instructions() const { return valid_instructions; }
@@ -35,9 +35,7 @@ class LevelManager{
 public:
     LevelManager();
     const Level& get_level(int level_id) const;
-    // 返回关卡总数
     int get_level_count() const { return levels.size(); }
-    //返回静态关卡数组的引用，便于菜单中遍历
     const vector<Level>& get_all_levels() const { return levels; }
     bool is_level_unlocked(int level_id) const;
     void set_local_level_unlocked(int level_id); //本地存储解锁状态

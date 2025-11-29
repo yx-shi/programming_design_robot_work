@@ -4,62 +4,14 @@
 #include"robot.h"
 #include <iomanip>
 #include <sstream>
-#include <thread>
-#include <chrono>
 #include <algorithm>
-#include <cstdio>
-#ifdef _WIN32
 #include <conio.h>
-#else
-#include <termios.h>
-#include <unistd.h>
-#endif
 using namespace std;
 
-#ifndef _WIN32
-class TerminalModeGuard {
-public:
-    TerminalModeGuard() {
-        if (tcgetattr(STDIN_FILENO, &oldt_) == 0) {
-            termios raw = oldt_;
-            raw.c_lflag &= ~(ICANON | ECHO);
-            raw.c_cc[VMIN] = 1;
-            raw.c_cc[VTIME] = 0;
-            if (tcsetattr(STDIN_FILENO, TCSANOW, &raw) == 0) {
-                enabled_ = true;
-            }
-        }
-    }
-    ~TerminalModeGuard() {
-        if (enabled_) {
-            tcsetattr(STDIN_FILENO, TCSANOW, &oldt_);
-        }
-    }
-private:
-    termios oldt_{};
-    bool enabled_{false};
-};
-#endif
-
 inline int read_menu_key() {
-#ifdef _WIN32
     int ch = _getch();
     if (ch == 0 || ch == 0xE0) ch = _getch();
     return ch;
-#else
-    int ch = getchar();
-    if (ch == '\033') {
-        int ch1 = getchar();
-        if (ch1 == '[') {
-            int ch2 = getchar();
-            if (ch2 == 'A') return 72;
-            if (ch2 == 'B') return 80;
-        }
-        return -1;
-    }
-    if (ch == '\n' || ch == '\r') return 13;
-    return ch;
-#endif
 }
 
 inline int initialize_view(const LevelManager& level_manager) {
@@ -67,10 +19,6 @@ inline int initialize_view(const LevelManager& level_manager) {
     const int total_items = level_count + 1; // 加上“退出游戏”
     int cursor = 0;
     string message;
-
-    #ifndef _WIN32
-    TerminalModeGuard raw_mode_guard;
-    #endif
 
     while (true) {
         cout << "\033[2J\033[H";
@@ -98,7 +46,7 @@ inline int initialize_view(const LevelManager& level_manager) {
             cursor = (cursor - 1 + total_items) % total_items;
         } else if (ch == 80) { // Arrow Down
             cursor = (cursor + 1) % total_items;
-        } else if (ch == 13 || ch == 10) { // Enter (Windows / Unix)
+        } else if (ch == 13) { // Enter
             if (cursor == level_count) {
                 return 0; // 退出
             }
@@ -322,9 +270,9 @@ inline void show_one_step(const Robot& robot) {
     }
 
     cout << "======================================================================" << endl;
-
-    // 添加延时，模拟动画过程
-    std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+    cout << "按 Enter 执行下一步..." << endl;
+    string _step_pause;
+    getline(cin, _step_pause);
 }
 
 inline void show_final_result(const Actuator& actuator, const RunResult& result) {

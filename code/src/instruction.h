@@ -13,7 +13,7 @@ enum class instruction_type {
 
 struct Instruction {
     instruction_type instruction; // 操作码
-    int arg;                      // 操作数（如空地编号 / 跳转目标行号）
+    int arg;                      // 操作数
     bool is_valid;       //标注指令是否合法
     bool has_arg() const {
         return instruction == instruction_type::ADD ||

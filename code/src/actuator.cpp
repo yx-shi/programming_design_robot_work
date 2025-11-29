@@ -9,7 +9,6 @@ using namespace std;
 
 //辅助函数，解析单行指令并处理
 Instruction parse_instruction_line(const string& line) {
-    // 解析指令
     string instr_str;
     string arg_str;
     int arg = -1;
@@ -25,7 +24,6 @@ Instruction parse_instruction_line(const string& line) {
     for (char& c : instr_str) {
         c = tolower(c);
     }
-    // 将字符串转换为 instruction_type
     instruction_type instr_type;
     bool is_valid = true;
     if (instr_str == "inbox") {
@@ -106,7 +104,6 @@ void Actuator::reset(int level_id) {
 }
 
 RunResult Actuator::run() {
-    // 根据当前 robot.level_id 获取关卡信息
     LevelManager lm;
     Level level = lm.get_level(robot.level_id);
 
@@ -114,7 +111,6 @@ RunResult Actuator::run() {
     robot.reset(robot.level_id);
     RunResult result;
     show_one_step(robot);
-    // 主执行循环
     while (true) {
         // 1. 如果 pc 越界，说明指令执行完成 → 关卡结束
         if (robot.pc < 0 || robot.pc >= (int)robot.program.size()) {
@@ -146,8 +142,7 @@ RunResult Actuator::run() {
             case instruction_type::INBOX: {
                 if (robot.input_box.empty()) {
                     // 执行 inbox 时输入传送带为空 → 关卡结束（正常）
-                    // 不视为错误，直接结束循环
-                    robot.pc++; // pc 增加与否都不影响结束判断，这里加 1 以保持一致性
+                    robot.pc++; // 这里加 1 以保持一致性
                     goto end_execution;
                 }
                 robot.current_box = robot.input_box.front();
@@ -292,9 +287,6 @@ end_execution:
     return result;
 }
 
-/*TODO：似乎还不够鲁棒，需要检查指令参数的合法性,如是否越界等，空地合法性检查可以调用is_valid_empty_space_arg函数
-* 对于jump的两个指令还没有检查
-*/
 bool Actuator::is_instruction_allowed(const Level& level, const Instruction& instr) const {
     string instr_str = instruction_to_string(instr.instruction);
     const set<string>& valid_instrs = level.get_valid_instructions();

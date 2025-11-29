@@ -4,7 +4,7 @@
 #include "robot.h"
 #include <limits>
 
-Actuator actuator;        //全局执行器对象
+Actuator actuator;  //全局执行器对象
 
 
 int game(){
@@ -78,7 +78,6 @@ int game(){
         }
     }
     RunResult result = actuator.run(); //执行程序
-    //其他待补充
     show_final_result(actuator, result); //显示最终结果
     return 0;
 }

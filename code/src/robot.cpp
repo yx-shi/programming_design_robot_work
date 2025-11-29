@@ -19,12 +19,8 @@ void Robot::reset(int level_id){
     pc = 0;
     exec_count = 0;
     current_box = INT_MIN;
-
-    // 获取关卡信息
     LevelManager lm;
     Level level = lm.get_level(level_id);
-
-    //根据关卡信息初始化输入传送带
     for(int val : level.get_input()){
         input_box.push(val);
     }
