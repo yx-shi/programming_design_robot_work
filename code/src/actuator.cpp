@@ -327,8 +327,5 @@ bool Actuator::is_valid_empty_space_arg(const Level& level, const Instruction& i
 }
 
 void Actuator::print_outbox() const {
-    for (const int& item : robot.output_box) {
-        cout << item << " ";
-    }
-    cout << endl;
+    robot.print_outbox();
 }

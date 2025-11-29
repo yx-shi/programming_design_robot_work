@@ -10,6 +10,27 @@ void initialize_view(const LevelManager& level_manager) {
     * 每个关卡的解锁状态
     * 提示用户选择关卡
     */
+       // 清屏（兼容Windows/Linux/Mac）
+    #ifdef _WIN32
+        system("cls");
+    #else
+        system("clear");
+    #endif
+
+    // 显示标题与关卡列表
+    cout << "==================== 关卡选择 ====================" << endl;
+    cout << "📌 请选择要挑战的关卡（已解锁关卡可直接进入）" << endl;
+    cout << "------------------------------------------------" << endl;
+
+    // 遍历所有关卡，显示编号、解锁状态
+    for (int i = 0; i < level_manager.get_level_count(); ++i) {
+        string status = level_manager.is_level_unlocked(i) ? "✅ 已解锁" : "❌ 未解锁";
+        cout << "  关卡" << (i + 1) << "：" << status << endl;
+    }
+
+    // 输入提示
+    cout << "------------------------------------------------" << endl;
+    cout << "请输入关卡编号（1-" << level_manager.get_level_count() << "）：";
 }
 
 void show_one_step(const Robot& robot) {
@@ -19,7 +40,38 @@ void show_one_step(const Robot& robot) {
 }
 
 void show_final_result(const Robot& robot, const RunResult& result) {
-    //TODO: 显示最终结果界面，包括成功或失败的信息，执行的指令数等
+    // 清屏
+    #ifdef _WIN32
+        system("cls");
+    #else
+        system("clear");
+    #endif
+
+    // 显示结果标题
+    int level_id = robot.level_id;
+    LevelManager level_manager;
+    cout << "==================== 第" << level_id << "关 结果 ====================" << endl;
+    if(result.type == RunResultType::SUCCESS) {
+        cout << "Success! 您已通过第" << level_id << "关" << endl;
+    } else if(result.type == RunResultType::FAIL) {
+        cout << "Fail! 程序执行结束，但输出与目标输出不一致。" << endl;
+        cout<<"目标输出为：";
+        Level cur_level = level_manager.get_level(level_id);
+        for(int val : cur_level.get_target_output()){
+            cout<<val<<" ";
+        }
+        cout << endl;
+        cout<<"您的输出为：";  
+        actuator.print_outbox();
+        // 显示详细统计信息
+        cout << "📊 执行统计：" << endl;
+        cout << "  - 总指令数：" << robot.program.size() << "条" << endl;
+        cout << "  - 实际执行：" << robot.exec_count << "条" << endl;
+        cout << "  - 最终指令进度：第" << robot.pc << "条" << endl;
+        cout << endl;
+    } else if(result.type == RunResultType::ERROR) {
+        cout << "Error on instruction " << result.error_index << "! " << endl;
+    }
 }
 
 void show_read_from_cli() {

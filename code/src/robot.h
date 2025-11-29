@@ -21,4 +21,5 @@ public:
     Robot():pc(0),exec_count(0),current_box(INT_MIN){}
     Robot(int level_id);   //根据关卡ID初始化机器人状态
     void reset(int level_id); //重置机器人状态
+    void print_outbox() const; //打印输出传送带状态
 };

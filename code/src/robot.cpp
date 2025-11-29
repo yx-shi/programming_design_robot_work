@@ -31,3 +31,10 @@ void Robot::reset(int level_id){
     // 初始化空地状态
     empty_spaces.resize(level.get_empty_count(), INT_MIN);
 }
+
+void Robot::print_outbox() const {
+    for (const int& item : output_box) {
+        cout << item << " ";
+    }
+    cout << endl;
+}
