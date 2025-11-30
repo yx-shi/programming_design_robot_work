@@ -16,11 +16,12 @@ int game(){
         return 1;
     }
     actuator.reset(level_id);
+    show_level_info(level_manager.get_level(level_id));
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
     //处理用户输入
     int input_error_count=0;
     while(1){
-        cout << "\033[2J\033[H";
+        // cout << "\033[2J\033[H";
         cout<<"请选择指令输入方式：\n1-直接输入指令\n2-读取文件\n请选择“1”或“2”:"<<endl;
         //直接读取用户的全部输入，对输入采用更鲁棒的处理方式
         string choice_str;
@@ -51,7 +52,7 @@ int game(){
                 continue;
             }
             int ins_num = stoi(ins_num_str);
-            cout << "\033[2J\033[H";
+            // cout << "\033[2J\033[H";
             cout<<"请依次输入"<<ins_num<<"条指令，注意每行一个指令，指令和操作数之间用空格分隔："<<endl;
             actuator.read_from_cli(ins_num);
             break;

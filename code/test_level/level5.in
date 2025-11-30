@@ -1,0 +1,32 @@
+inbox
+jumpifzero 17
+copyto 0
+inbox
+jumpifzero 20
+copyto 1
+copyto 3
+sub 0
+copyto 2
+copyfrom 0
+sub 2
+jumpifzero 23
+copyto 0
+copyfrom 3
+add 1
+copyto 3
+jump 10
+outbox
+inbox
+jump 25
+outbox
+jump 25
+copyfrom 3
+outbox
+inbox
+jumpifzero 18
+copyto 0
+inbox
+jumpifzero 21
+copyto 1
+copyto 3
+jump 10

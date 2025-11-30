@@ -28,7 +28,7 @@ vector<Level> LevelManager::levels; // 静态成员初始化
 
 LevelManager::LevelManager(){
     if(levels.empty()){
-        // ========== 初始化关卡1 ==========
+        // 初始化关卡1 
         Level level1(1); 
         vector<int> input1 = {1, 2};
         level1.set_input(input1);
@@ -37,13 +37,15 @@ LevelManager::LevelManager(){
         level1.set_empty_count(0);
         set<string> inst1 = {"inbox", "outbox"};
         level1.set_valid_instructions(inst1);
+        string title1 = "简单搬运";
+        level1.set_title(title1);
         string desc1 = "让机器人取出输入序列上的每个积木放入输出序列中";
         level1.set_description(desc1);
         // 解锁关卡1（默认第一个关卡解锁）
         level1.unlock();
         levels.push_back(level1);
 
-        // ========== 初始化关卡2 ==========
+        // 初始化关卡2 
         Level level2(2); 
         vector<int> input2 = {3, 9, 5, 1, -2, -2, 9, -9};
         level2.set_input(input2);
@@ -52,10 +54,11 @@ LevelManager::LevelManager(){
         level2.set_empty_count(3);
         set<string> inst2 = {"inbox", "outbox", "copyfrom", "copyto", "add", "sub", "jump", "jumpifzero"};
         level2.set_valid_instructions(inst2);
+        level2.set_title("加减运算");
         string desc2 = "对于输入序列中的每两个东西，先把第1个减去第2个，并把结果放在输出序列中，然后把第2个减去第1个，再把结果放在输出序列中，重复。";
         levels.push_back(level2);
 
-        // ========== 初始化关卡3 ==========
+        // 初始化关卡3
         Level level3(3); 
         vector<int> input3 = {6, 2, 7, 7, -9, 3, -3, -3};
         level3.set_input(input3);
@@ -64,9 +67,31 @@ LevelManager::LevelManager(){
         level3.set_empty_count(3);
         set<string> inst3 = {"inbox", "outbox", "copyfrom", "copyto", "add", "sub", "jump", "jumpifzero"};
         level3.set_valid_instructions(inst3);
+        level3.set_title("比较输出");
         string desc3 = "从输入序列中依次取2个数字，如果相等则将其中一个输出，否则扔掉。重复这个过程直到输入传送带为空。";
         level3.set_description(desc3);
         levels.push_back(level3);
+
+        //初始化关卡4
+        Level level4(4);
+        level4.set_title("模拟乘法：三倍放大");
+        level4.set_description("考虑使用累计加法来模拟乘法");
+        level4.set_input({3, 1, -5, 4, 0, -2});
+        level4.set_target_output({9, 3, -15, 12, 0, -6});
+        level4.set_empty_count(1);
+        level4.set_valid_instructions({"inbox", "outbox", "copyto", "copyfrom", "add","jump"});
+        levels.push_back(level4);
+
+        //初始化关卡5
+        Level level5(5);
+        level5.set_title("模拟乘法：正整数相乘");
+        level5.set_description("考虑在空地存储一个计数器实现乘法模拟");
+        level5.set_input({3,4,2,5,0,1});
+        level5.set_target_output({12,10,0});
+        level5.set_empty_count(4);
+        level5.set_valid_instructions({"inbox", "outbox", "copyto", "copyfrom", "add","sub","jump","jumpifzero"});
+        levels.push_back(level5);
+
         load_local_levels(); // 从本地存储加载关卡解锁状态
     }
 }

@@ -7,6 +7,7 @@ using namespace std;
 
 class Level{
     int id;           //关卡ID
+    string title;    //关卡标题
     bool is_unlocked;   //是否解锁
     vector<int> input;  //输入序列
     vector<int> target_output;  //目标输出序列
@@ -16,6 +17,7 @@ class Level{
 public:
     void unlock();
     Level(int level_id=0):id(level_id),is_unlocked(false),empty_count(0){}
+    void set_title(const string& t) { title = t; }
     void set_input(const vector<int>& in);    
     void set_target_output(const vector<int>& out);  
     void set_empty_count(int count);  
@@ -28,6 +30,7 @@ public:
     vector<int> get_target_output() const { return target_output; }
     set<string> get_valid_instructions() const { return valid_instructions; }
     string get_description() const { return description; }
+    string get_title() const { return title; }
 };
 
 class LevelManager{

@@ -271,7 +271,7 @@ end_execution:
             }
             if (same) {
                 result.type = RunResultType::SUCCESS;
-                if(robot.level_id + 1 <= lm.get_level_count()) {
+                if(robot.level_id + 1 <= lm.get_level_count()&& !lm.is_level_unlocked(robot.level_id + 1)) {
                     lm.set_level_unlocked(robot.level_id+1); // 解锁下一关
                     lm.set_local_level_unlocked(robot.level_id+1); // 本地存储解锁状态
                 }

@@ -14,6 +14,33 @@ inline int read_menu_key() {
     return ch;
 }
 
+inline void show_level_info(const Level& level) {
+    cout << "\033[2J\033[H";
+    cout << "==================== 关卡信息 ====================" << endl;
+    cout << "关卡 " << level.get_id() << "：" << level.get_title() << endl;
+    cout <<"提示："<<level.get_description()<<endl;
+    cout << "输入序列: ";
+    for (int val : level.get_input()) {
+        cout << val << " ";
+    }
+    cout << endl;
+    cout << "目标输出序列: ";
+    for (int val : level.get_target_output()) {
+        cout << val << " ";
+    }
+    cout << endl;
+    cout << "空地数量: " << level.get_empty_count() << endl;
+    cout << "有效指令: ";
+    for (const auto& instr : level.get_valid_instructions()) {
+        cout << instr << " ";
+    }
+    cout << endl;
+    cout << "===============================================" << endl;
+    cout << "按 Enter 键继续..." << endl;
+    string _pause;
+    getline(cin, _pause);
+}
+
 inline int initialize_view(const LevelManager& level_manager) {
     const int level_count = level_manager.get_level_count();
     const int total_items = level_count + 1; // 加上“退出游戏”
@@ -95,10 +122,7 @@ inline void show_one_step(const Robot& robot) {
 
     // 顶部关卡与标题信息
     cout << "======================================================================" << endl;
-    cout << "                         机器人积木关卡";
-    cout << " (Level " << robot.level_id << ")" << endl;
-    cout << "-----------------------------------------------------------------------" << endl;
-    cout << "描述: " << level_desc << endl;
+    cout << "                       关卡 " << cur_level.get_id() << ": " << cur_level.get_title() << endl;
     cout << "======================================================================" << endl;
 
     // 上半部分：游戏画面（输入/输出/机器人/当前积木）与右侧指令列表
@@ -227,9 +251,9 @@ inline void show_one_step(const Robot& robot) {
 
     // 右侧指令列表（保留最多 20 条）
     vector<string> instr_lines;
-    instr_lines.push_back("指令序列 (最多显示前 20 条，-> 为当前执行)：");
+    instr_lines.push_back("指令序列 (最多显示前 24 条)：");
     int total_instr = static_cast<int>(robot.program.size());
-    int instr_limit = min(total_instr, 20);
+    int instr_limit = min(total_instr, 24);
     for (int i = 0; i < instr_limit; ++i) {
         instr_lines.push_back(format_instr_for_view(robot.program[i], i + 1, robot.pc));
     }
